@@ -1,17 +1,28 @@
 {
-  "name": "meeting-automation",
+  "name": "email-vote-system",
   "version": "1.0.0",
-  "description": "Automatische Terminabstimmung mit Outlook und Teams",
+  "description": "Automatische Terminabstimmung mit Outlook + Netlify + Teams",
   "main": "index.js",
   "scripts": {
-    "start": "netlify dev",
-    "build": "echo 'Keine Build-Schritte erforderlich'"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tibi2024/email-vote-system.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tibi2024/email-vote-system/issues"
+  },
+  "homepage": "https://github.com/Tibi2024/email-vote-system#readme",
   "dependencies": {
-    "@octokit/rest": "^19.0.0"
-  },
-  "devDependencies": {},
-  "keywords": ["outlook", "teams", "automation", "voting"],
-  "author": "Marc Wiesner",
-  "license": "MIT"
+    "@anthropic-ai/sdk": "^0.54.0",
+    "@azure/msal-node": "^3.6.1",
+    "@netlify/functions": "^4.1.6",
+    "axios": "^1.10.0",
+    "openai": "^5.6.0",
+    "postgresql": "^0.0.1"
+  }
 }
