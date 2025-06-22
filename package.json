@@ -1,0 +1,17 @@
+{
+  "name": "meeting-automation",
+  "version": "1.0.0",
+  "description": "Automatische Terminabstimmung mit Outlook und Teams",
+  "main": "index.js",
+  "scripts": {
+    "start": "netlify dev",
+    "build": "echo 'Keine Build-Schritte erforderlich'"
+  },
+  "dependencies": {
+    "@octokit/rest": "^19.0.0"
+  },
+  "devDependencies": {},
+  "keywords": ["outlook", "teams", "automation", "voting"],
+  "author": "Marc Wiesner",
+  "license": "MIT"
+}
