@@ -21,8 +21,8 @@
     "@anthropic-ai/sdk": "^0.54.0",
     "@azure/msal-node": "^3.6.1",
     "@netlify/functions": "^4.1.6",
+    "@supabase/supabase-js": "^2.39.0",
     "axios": "^1.10.0",
-    "openai": "^5.6.0",
-    "postgresql": "^0.0.1"
+    "openai": "^5.6.0"
   }
 }
