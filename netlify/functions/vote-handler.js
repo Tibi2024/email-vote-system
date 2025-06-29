@@ -18,7 +18,7 @@ exports.handler = async (event, context) => {
     const cleanSubject = emailData.subject.replace(/^(re:|fwd:)\s*/i, '').trim();
     const meeting_id = cleanSubject;
 
-    // GPT-Anfrage
+    // GPT-Anfrage mit angepasstem Prompt
     const gptResponse = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
@@ -34,6 +34,7 @@ exports.handler = async (event, context) => {
               '- Wie viele Personen sollen teilnehmen? (teilnehmeranzahl)\n' +
               '- Müssen alle Teilnehmer zwingend dabei sein? (alle_teilnehmen, Standard: ja, außer es steht explizit etwas anderes in der E-Mail)\n' +
               '- Wann soll das Meeting stattfinden? (datum und uhrzeit)\n' +
+              'Achte darauf, dass du dich bei den Fragen zur Teilnehmeranzahl und zur zwingenden Teilnahme auf die ursprüngliche E-Mail (Absender: marc.wiesner@lexulus.ai) beziehst, auch wenn im Thread weitere Antworten enthalten sind.\n' +
               'Antworte immer im folgenden JSON-Format:\n' +
               `{
                 "teilnehmeranzahl": 0,
