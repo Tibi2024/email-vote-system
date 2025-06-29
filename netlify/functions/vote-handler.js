@@ -18,10 +18,27 @@ exports.handler = async (event, context) => {
     const gptResponse = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4', // oder 'gpt-4-1106-preview' für die neueste Version, wenn du Zugriff hast
         messages: [
-          { role: 'system', content: 'Du bist ein hilfreicher Assistent.' },
-          { role: 'user', content: 'Extrahiere das Datum und die Uhrzeit aus folgendem Text: ' + emailData.body }
+          { 
+            role: 'system', 
+            content: 'Du bist ein hilfreicher Assistent. Extrahiere aus dem E-Mail-Text die gewünschten Informationen und gib sie als strukturiertes JSON zurück.' 
+          },
+          { 
+            role: 'user', 
+            content: 'Extrahiere aus folgendem E-Mail-Text:\n' +
+              '- Wie viele Personen sollen teilnehmen? (teilnehmeranzahl)\n' +
+              '- Müssen alle Teilnehmer zwingend dabei sein? (alle_teilnehmen, Standard: ja, außer es steht explizit etwas anderes in der E-Mail)\n' +
+              '- Wann soll das Meeting stattfinden? (datum und uhrzeit)\n' +
+              'Antworte immer im folgenden JSON-Format:\n' +
+              `{
+                "teilnehmeranzahl": 0,
+                "alle_teilnehmen": true,
+                "datum": "YYYY-MM-DD",
+                "uhrzeit": "HH:MM"
+              }` +
+              '\nHier ist der E-Mail-Text:\n' + emailData.body
+          }
         ]
       },
       {
