@@ -1,7 +1,9 @@
 const axios = require('axios');
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 exports.handler = async (event, context) => {
-  // Nur POST-Requests akzeptieren
+  // Nur POST akzeptieren
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -9,23 +11,25 @@ exports.handler = async (event, context) => {
     };
   }
 
-  console.log('Webhook received:', event.body);
-
   try {
     const emailData = JSON.parse(event.body);
-    
-    // GPT-Anfrage (OpenAI)
+
+    // Betreff normalisieren und als meeting_id nutzen
+    const cleanSubject = emailData.subject.replace(/^(re:|fwd:)\s*/i, '').trim();
+    const meeting_id = cleanSubject;
+
+    // GPT-Anfrage
     const gptResponse = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
-        model: 'gpt-4', // oder 'gpt-4-1106-preview' für die neueste Version, wenn du Zugriff hast
+        model: 'gpt-4',
         messages: [
-          { 
-            role: 'system', 
-            content: 'Du bist ein hilfreicher Assistent. Extrahiere aus dem E-Mail-Text die gewünschten Informationen und gib sie als strukturiertes JSON zurück.' 
+          {
+            role: 'system',
+            content: 'Du bist ein hilfreicher Assistent. Extrahiere aus dem E-Mail-Text die gewünschten Informationen und gib sie als strukturiertes JSON zurück.'
           },
-          { 
-            role: 'user', 
+          {
+            role: 'user',
             content: 'Extrahiere aus folgendem E-Mail-Text:\n' +
               '- Wie viele Personen sollen teilnehmen? (teilnehmeranzahl)\n' +
               '- Müssen alle Teilnehmer zwingend dabei sein? (alle_teilnehmen, Standard: ja, außer es steht explizit etwas anderes in der E-Mail)\n' +
@@ -50,21 +54,38 @@ exports.handler = async (event, context) => {
     );
 
     const gptAnswer = gptResponse.data.choices[0].message.content;
-    console.log('GPT-Antwort:', gptAnswer);
+    const extractedData = JSON.parse(gptAnswer);
+
+    // Daten in Supabase speichern
+    const { data, error } = await supabase
+      .from('meetings')
+      .upsert({
+        meeting_id: meeting_id,
+        teilnehmeranzahl: extractedData.teilnehmeranzahl,
+        alle_teilnehmen: extractedData.alle_teilnehmen,
+        datum: extractedData.datum,
+        uhrzeit: extractedData.uhrzeit
+      }, { onConflict: 'meeting_id' });
+
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
 
     return {
       statusCode: 200,
       body: JSON.stringify({
-        message: 'Email received and processed by GPT',
+        message: 'Email received, processed by GPT and saved to Supabase',
         received: emailData,
-        gptResponse: gptAnswer
+        gptResponse: gptAnswer,
+        supabaseResult: data
       })
     };
   } catch (error) {
     console.error('Error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error' })
+      body: JSON.stringify({ error: error.message })
     };
   }
 };
