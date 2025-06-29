@@ -48,8 +48,9 @@ exports.handler = async (event, context) => {
       },
       {
         headers: {
-          'Authorization': 'Bearer ' + process.env.OPENAI_API_KEY,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + process.env.OPENAI_API_KEY
+          
         }
       }
     );
